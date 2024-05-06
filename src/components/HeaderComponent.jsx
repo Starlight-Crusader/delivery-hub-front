@@ -1,9 +1,10 @@
 import { useContext, useState } from "react";
-import { AuthContext } from "../App";
+import { UserDataContext } from "../App";
 import { InputGroup, FormControl, Button } from "react-bootstrap";
 
 const HeaderComponent = () => {
-  const { authenticated, switchAuth } = useContext(AuthContext);
+  const { authenticated, agentType, userRole, switchAuth } =
+    useContext(UserDataContext);
 
   const [btnHovered, setBtnHovered] = useState(false);
 
@@ -49,6 +50,10 @@ const HeaderComponent = () => {
     }
   };
 
+  const handleLogout = () => {
+    switchAuth("", "", 0, 0);
+  };
+
   const handleChange = (e) => {
     setIdentData({
       ...identData,
@@ -56,7 +61,8 @@ const HeaderComponent = () => {
     });
   };
 
-  const userRoles = ["", "Viewer", "Worker", "Manager"];
+  const userRolesStr = ["", "Viewer", "Worker", "Manager"];
+  const agentTypesStr = ["", "C", "P"];
 
   return (
     <div
@@ -64,8 +70,8 @@ const HeaderComponent = () => {
       style={{
         width: "100%",
         height: "5vw",
-        borderTop: "0.3vw #434952 solid",
-        borderBottom: "0.3vw #434952 solid",
+        borderTop: "5px #434952 solid",
+        borderBottom: "5px #434952 solid",
         padding: "0 7vw",
       }}
     >
@@ -88,7 +94,7 @@ const HeaderComponent = () => {
 
       {!authenticated ? (
         <div>
-          <InputGroup>
+          <InputGroup style={{ width: "30vw" }}>
             <FormControl
               placeholder="Agent name"
               aria-label="Agent name"
@@ -123,11 +129,27 @@ const HeaderComponent = () => {
           </InputGroup>
         </div>
       ) : (
-        <div>
+        <div className="d-flex flex-row align-items-center">
           <p style={{ fontSize: "1.3vw" }}>
-            Welcome back, {sessionStorage.getItem("agent-name")}{" "}
-            {userRoles[sessionStorage.getItem("user-role")]}
+            Welcome back, {sessionStorage.getItem("agent-name")} (
+            {agentTypesStr[agentType]}) {userRolesStr[userRole]}
           </p>
+
+          <Button
+            variant="primary"
+            onClick={handleLogout}
+            style={{
+              backgroundColor: btnHovered ? "white" : "#434952",
+              color: btnHovered ? "#434952" : "white",
+              border: btnHovered ? "1px #434952 solid" : "none",
+              transition: "background-color 0.3s, color 0.3s",
+              marginLeft: "20px",
+            }}
+            onMouseEnter={() => setBtnHovered(true)}
+            onMouseLeave={() => setBtnHovered(false)}
+          >
+            Logout
+          </Button>
         </div>
       )}
     </div>

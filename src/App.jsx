@@ -1,33 +1,37 @@
 import React, { createContext, useState } from "react";
 import HeaderComponent from "./components/HeaderComponent";
+import MainComponent from "./components/MainComponent";
 
-export const AuthContext = createContext(false);
-
+export const UserDataContext = createContext();
 function App() {
   const [authenticated, setAuthenticated] = useState(false);
+  const [agentType, setAgentType] = useState(0);
+  const [userRole, setUserRole] = useState(0);
 
   const switchAuth = (token, aName, aType, uRole) => {
     if (token.length === 0) {
       setAuthenticated(false);
+      setAgentType(0);
+      setUserRole(0);
 
       sessionStorage.removeItem("auth-token");
       sessionStorage.removeItem("agent-name");
-      sessionStorage.removeItem("agent-type");
-      sessionStorage.removeItem("user-role");
     } else {
       setAuthenticated(true);
+      setAgentType(aType);
+      setUserRole(uRole);
 
       sessionStorage.setItem("auth-token", token);
       sessionStorage.setItem("agent-name", aName);
-      sessionStorage.setItem("agent-type", aType);
-      sessionStorage.setItem("user-role", uRole);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ authenticated, switchAuth }}>
+    <UserDataContext.Provider
+      value={{ authenticated, agentType, userRole, switchAuth }}
+    >
       <div
-        className="container"
+        className="container d-flex flex-column align-items-center"
         style={{
           maxWidth: "75vw",
           height: "100vh",
@@ -35,9 +39,16 @@ function App() {
           padding: 0,
         }}
       >
-        <HeaderComponent></HeaderComponent>
+        <HeaderComponent />
+
+        <div
+          style={{ width: "100%", flexGrow: 1 }}
+          className="d-flex flex-column align-items-center justify-content-center"
+        >
+          <MainComponent />
+        </div>
       </div>
-    </AuthContext.Provider>
+    </UserDataContext.Provider>
   );
 }
 
