@@ -8,6 +8,7 @@ const fIconSrcLink = "https://cdn-icons-png.freepik.com/512/4848/4848621.png";
 const checkURL = "http://127.0.0.1:8000/api/deliveries/check/";
 const takeURL = "http://127.0.0.1:8000/api/deliveries/take/";
 const openURL = "http://127.0.0.1:8000/api/deliveries/create";
+const removeURL = "http://127.0.01:8000/api/deliveries/remove-one/";
 
 const defGetURL = "http://127.0.0.1:8000/api/deliveries/get";
 
@@ -88,12 +89,10 @@ const MainComponent = () => {
         body: reqBody,
       });
 
-      console.log(response);
-
       const jsonData = await response.json();
 
       if (response.status == 200 || response.status == 201) {
-        fetchData();
+        fetchData(currPageURL);
       } else if (response.status == 401) {
         alert("Auth. credentials are expired/incorrect/missing!");
         setData([]);
@@ -118,14 +117,18 @@ const MainComponent = () => {
     UDMI(openURL, "POST", JSON.stringify({ to_name: recipientAgentName }));
   };
 
+  const handleRemove = (id) => {
+    UDMI(removeURL + id, "DELETE", "");
+  };
+
   const handleChange = (e) => {
     setRecipientAgentName(e.target.value);
   };
 
   return authenticated ? (
-    data.length > 0 ? (
-      <>
-        <div className="d-flex flex-column align-items-center">
+    <>
+      <div className="d-flex flex-column align-items-center">
+        {data.length > 0 ? (
           <table style={{ width: "75%" }} className="table table-striped">
             <thead>
               <tr>
@@ -218,6 +221,31 @@ const MainComponent = () => {
                     </td>
                   ) : null}
 
+                  {userRole == 3 &&
+                  agentType == 1 &&
+                  item.by_agent == localStorage.getItem("agent-name") ? (
+                    <td>
+                      <Button
+                        variant="primary"
+                        style={{
+                          backgroundColor: "#434952",
+                          color: "white",
+                          border: "none",
+                          transition: "background-color 0.3s, color 0.3s",
+                          fontSize: "15px",
+                          marginLeft: "50px",
+                        }}
+                        onMouseOver={btnHandleMouseOver}
+                        onMouseLeave={btnHandleMouseLeave}
+                        onClick={() => handleRemove(item.id)}
+                      >
+                        Remove
+                      </Button>
+                    </td>
+                  ) : (
+                    <td></td>
+                  )}
+
                   {userRole == 3 && agentType == 2 && item.by_agent === null ? (
                     <td>
                       <Button
@@ -244,59 +272,59 @@ const MainComponent = () => {
               ))}
             </tbody>
           </table>
+        ) : (
+          <p style={{ fontSize: "1.5vw", marginBottom: "5vw" }}>
+            No records available!
+          </p>
+        )}
 
-          {userRole == 3 && agentType == 1 && (
-            <InputGroup style={{ width: "30vw", marginTop: "30px" }}>
-              <FormControl
-                placeholder="Agent name"
-                aria-label="Agent name"
-                aria-describedby="basic-addon1"
-                name="name"
-                value={recipientAgentName}
-                onChange={handleChange}
-              />
-              <Button
-                variant="primary"
-                style={{
-                  backgroundColor: "#434952",
-                  color: "white",
-                  border: "none",
-                  transition: "background-color 0.3s, color 0.3s",
-                  fontSize: "15px",
-                }}
-                onMouseOver={btnHandleMouseOver}
-                onMouseLeave={btnHandleMouseLeave}
-                onClick={() => handleOpen()}
-              >
-                Open a new delivery order
-              </Button>
-            </InputGroup>
-          )}
-        </div>
+        {userRole == 3 && agentType == 1 && (
+          <InputGroup style={{ width: "30vw", marginTop: "30px" }}>
+            <FormControl
+              placeholder="Agent name"
+              aria-label="Agent name"
+              aria-describedby="basic-addon1"
+              name="name"
+              value={recipientAgentName}
+              onChange={handleChange}
+            />
+            <Button
+              variant="primary"
+              style={{
+                backgroundColor: "#434952",
+                color: "white",
+                border: "none",
+                transition: "background-color 0.3s, color 0.3s",
+                fontSize: "15px",
+              }}
+              onMouseOver={btnHandleMouseOver}
+              onMouseLeave={btnHandleMouseLeave}
+              onClick={() => handleOpen()}
+            >
+              Open a new delivery order
+            </Button>
+          </InputGroup>
+        )}
+      </div>
 
-        <Pagination>
-          <Pagination.Prev
-            onClick={() => {
-              setCurrPageURL(prevPageURL);
-              setCurrPageNum(currPageNum - 1);
-            }}
-            disabled={prevPageURL === null}
-          />
-          <Pagination.Item disabled>{currPageNum}</Pagination.Item>
-          <Pagination.Next
-            onClick={() => {
-              setCurrPageURL(nextPageURL);
-              setCurrPageNum(currPageNum + 1);
-            }}
-            disabled={nextPageURL === null}
-          />
-        </Pagination>
-      </>
-    ) : (
-      <p style={{ fontSize: "1.5vw", marginBottom: "5vw" }}>
-        No records available!
-      </p>
-    )
+      <Pagination>
+        <Pagination.Prev
+          onClick={() => {
+            setCurrPageURL(prevPageURL);
+            setCurrPageNum(currPageNum - 1);
+          }}
+          disabled={prevPageURL === null}
+        />
+        <Pagination.Item disabled>{currPageNum}</Pagination.Item>
+        <Pagination.Next
+          onClick={() => {
+            setCurrPageURL(nextPageURL);
+            setCurrPageNum(currPageNum + 1);
+          }}
+          disabled={nextPageURL === null}
+        />
+      </Pagination>
+    </>
   ) : (
     <p style={{ fontSize: "1.5vw", marginBottom: "5vw" }}>
       Authenticate in order to see delivery records...
