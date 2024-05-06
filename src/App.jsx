@@ -42,8 +42,8 @@ function App() {
         <HeaderComponent />
 
         <div
-          style={{ width: "100%", flexGrow: 1 }}
-          className="d-flex flex-column align-items-center justify-content-center"
+          style={{ width: "100%", flexGrow: 1, padding: "4vw 0" }}
+          className="d-flex flex-column align-items-center justify-content-between"
         >
           <MainComponent />
         </div>
