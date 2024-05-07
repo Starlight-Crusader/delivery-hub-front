@@ -93,7 +93,7 @@ const MainComponent = () => {
 
       if (response.status == 200 || response.status == 201) {
         fetchData(currPageURL);
-      } else if (response.status == 401) {
+      } else if (response.status == 401 || response.status == 403) {
         alert("Auth. credentials are expired/incorrect/missing!");
         setData([]);
         switchAuth("", "", 0, 0);
