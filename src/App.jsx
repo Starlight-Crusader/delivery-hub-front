@@ -1,35 +1,55 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { createContext, useState } from "react";
+import HeaderComponent from "./components/HeaderComponent";
+import MainComponent from "./components/MainComponent";
 
+export const UserDataContext = createContext();
 function App() {
-  const [count, setCount] = useState(0)
+  const [authenticated, setAuthenticated] = useState(false);
+  const [agentType, setAgentType] = useState(0);
+  const [userRole, setUserRole] = useState(0);
+
+  const switchAuth = (token, aName, aType, uRole) => {
+    if (token.length === 0) {
+      setAuthenticated(false);
+      setAgentType(0);
+      setUserRole(0);
+
+      sessionStorage.removeItem("auth-token");
+      sessionStorage.removeItem("agent-name");
+    } else {
+      setAuthenticated(true);
+      setAgentType(aType);
+      setUserRole(uRole);
+
+      sessionStorage.setItem("auth-token", token);
+      sessionStorage.setItem("agent-name", aName);
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <UserDataContext.Provider
+      value={{ authenticated, agentType, userRole, switchAuth }}
+    >
+      <div
+        className="container d-flex flex-column align-items-center"
+        style={{
+          maxWidth: "75vw",
+          height: "100vh",
+          backgroundColor: "white",
+          padding: 0,
+        }}
+      >
+        <HeaderComponent />
+
+        <div
+          style={{ width: "100%", flexGrow: 1, padding: "4vw 0" }}
+          className="d-flex flex-column align-items-center justify-content-between"
+        >
+          <MainComponent />
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </UserDataContext.Provider>
+  );
 }
 
-export default App
+export default App;
